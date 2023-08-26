@@ -10,17 +10,17 @@ type Tag struct {
 	*CreateTagRequest
 }
 
-type TagSet struct {
+type Set struct {
 	Items []*Tag `json:"items"`
 }
 
 type CreateTagRequest struct {
 	// 关联的博客, 同一标签，允许打在不同博客上的
-	BlogId int `json:"blog_id" validate:"required"`
+	BlogId int
 	// 标签名称
-	Key string `json:"key" validate:"required"`
+	Key string
 	// 标签的value
-	Value string `json:"value" validate:"required"`
+	Value string
 	// 标签的颜色
 	Color string `json:"color"`
 }

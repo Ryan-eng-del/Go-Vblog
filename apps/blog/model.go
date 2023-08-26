@@ -1,5 +1,7 @@
 package blog
 
+import "go-vblog/apps/tag"
+
 type Blog struct {
 	// 文章Id
 	Id int
@@ -13,11 +15,16 @@ type Blog struct {
 	*CreateBlogRequest
 	// 文章状态 草稿/发布
 	Status Status
+	Tags   []*tag.Tag
 }
 
 type BlogSet struct {
 	blogs []*Blog
 	total int32
+}
+
+func NewCreateBlogRequest() *CreateBlogRequest {
+	return &CreateBlogRequest{}
 }
 
 type CreateBlogRequest struct {
