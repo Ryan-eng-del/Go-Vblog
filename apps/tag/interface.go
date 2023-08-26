@@ -1,0 +1,1 @@
+package tagimport (	"context")type Service interface {	// QueryTag 查询标签	QueryTag(context.Context, *QueryTagRequest) (*TagSet, error)	// AddTag 文章添加Tag	AddTag(context.Context, *AddTagRequest) (*TagSet, error)	// RemoveTag 文章移除Tag	RemoveTag(context.Context, *RemoveTagRequest) (*TagSet, error)}
