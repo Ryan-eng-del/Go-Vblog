@@ -2,11 +2,20 @@ package impl
 
 import (
 	"context"
+	"github.com/infraboard/mcube/exception"
 	"go-vblog/apps/blog"
 )
 
-func (*Impl) CreateBlog(context.Context, *blog.CreateBlogRequest) (*blog.Blog, error) {
-	return nil, nil
+func (i *Impl) CreateBlog(ctx context.Context, req *blog.CreateBlogRequest) (*blog.Blog, error) {
+	if err := req.Validate(); err != nil {
+		return nil, exception.NewBadRequest("validate create blog request error")
+	}
+	instance := blog.NewCreateBlog(req)
+
+	if err := i.save(ctx, instance); err != nil {
+		return nil, err
+	}
+	return instance, nil
 }
 
 // UpdateBlog 更新文章

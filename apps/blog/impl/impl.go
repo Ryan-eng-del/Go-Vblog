@@ -15,6 +15,14 @@ func NewBlogServiceImpl() *Impl {
 	return &Impl{}
 }
 
+func (i *Impl) Name() string {
+	return "blog"
+}
+
+func (i *Impl) DB() *gorm.DB {
+	return i.db.Table(i.Name())
+}
+
 func (i *Impl) Init() error {
 	i.db = conf.C().MySQL.GetORMDB().Debug()
 	i.db_real = conf.C().MySQL.GetDB()

@@ -1,21 +1,43 @@
 package blog
 
-import "go-vblog/apps/tag"
+import (
+	"encoding/json"
+	"go-vblog/apps/tag"
+	"time"
+)
+import "github.com/go-playground/validator/v10"
+
+var validate = validator.New()
+
+func (b *Blog) String() string {
+	dj, _ := json.Marshal(b)
+	return string(dj)
+}
+
+func NewCreateBlog(req *CreateBlogRequest) *Blog {
+	return &Blog{
+		CreateAt:          time.Now().Unix(),
+		CreateBlogRequest: req,
+		Status:            STATUS_DRAFT,
+		Tags:              []*tag.Tag{},
+	}
+}
 
 type Blog struct {
 	// 文章Id
-	Id int
+	Id int `json:"id" gorm:"primaryKey"`
 	// 创建时间
-	CreateAt int64
+	CreateAt int64 `json:"create_at"`
 	// 更新时间
-	UpdateAt int64
+	UpdateAt int64 `json:"update_at"`
 	// 发布时间
-	PublishAt int64
+	PublishAt int64 `json:"publish_at"`
 	// 用户提交数据
 	*CreateBlogRequest
 	// 文章状态 草稿/发布
-	Status Status
-	Tags   []*tag.Tag
+	Status Status `json:"status"`
+	// 博客标签
+	Tags []*tag.Tag `json:"tags"`
 }
 
 type BlogSet struct {
@@ -27,19 +49,23 @@ func NewCreateBlogRequest() *CreateBlogRequest {
 	return &CreateBlogRequest{}
 }
 
+func (c *CreateBlogRequest) Validate() error {
+	return validate.Struct(c)
+}
+
 type CreateBlogRequest struct {
 	// 文章摘要信息,通过提前Content内容获取
-	Summary string
+	Summary string `json:"summary" validate:"required" gorm:"-"`
 	// 文章图片
-	TitleImg string
+	TitleImg string `json:"title_img"`
 	// 文章标题
-	TitleName string
+	TitleName string `json:"title_name" validate:"required"`
 	// 文章副标题
-	SubTitle string
+	SubTitle string `json:"sub_title"`
 	// 文章内容
-	Content string
+	Content string `json:"content" validate:"required"`
 	// 文章作者
-	Author string
+	Author string `json:"author"`
 }
 
 type UpdateBlogRequest struct {

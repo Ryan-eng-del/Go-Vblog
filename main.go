@@ -7,5 +7,7 @@ import (
 
 func main() {
 	conf.LoadConfigFromEnv()
-	impl.NewBlogServiceImpl().Init()
+	if err := impl.NewBlogServiceImpl().Init(); err != nil {
+		panic(err)
+	}
 }
