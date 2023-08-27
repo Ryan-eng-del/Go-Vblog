@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/infraboard/mcube/exception"
 	"go-vblog/apps/blog"
+	"time"
 )
 
 func (i *Impl) CreateBlog(ctx context.Context, req *blog.CreateBlogRequest) (*blog.Blog, error) {
@@ -111,6 +112,27 @@ func (i *Impl) UpdateBlog(ctx context.Context, req *blog.UpdateBlogRequest) (*bl
 }
 
 // UpdateBlogStatus 更新文章的状态
-func (*Impl) UpdateBlogStatus(context.Context, *blog.UpdateBlogStatusRequest) (*blog.Blog, error) {
-	return nil, nil
+func (i *Impl) UpdateBlogStatus(ctx context.Context, req *blog.UpdateBlogStatusRequest) (*blog.Blog, error) {
+
+	instance, err := i.DescribeBlog(ctx, blog.NewDescribeBlogRequest(req.Id))
+
+	if err != nil {
+		return nil, err
+	}
+
+	// 修改状态
+	if instance.Status == req.Status {
+		return nil, exception.NewBadRequest("status aready %s", req.Status)
+	}
+
+	instance.Status = req.Status
+	if instance.Status == blog.STATUS_PUBLISHED {
+		instance.PublishAt = time.Now().Unix()
+	}
+
+	if err := i.DB().WithContext(ctx).Save(instance).Error; err != nil {
+		return nil, err
+	}
+
+	return instance, nil
 }
