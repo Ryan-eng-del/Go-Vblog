@@ -2,6 +2,7 @@ package impl
 
 import (
 	"database/sql"
+	"go-vblog/apps/blog"
 	"go-vblog/conf"
 	"gorm.io/gorm"
 )
@@ -16,7 +17,7 @@ func NewBlogServiceImpl() *Impl {
 }
 
 func (i *Impl) Name() string {
-	return "blog"
+	return blog.AppName
 }
 
 func (i *Impl) DB() *gorm.DB {

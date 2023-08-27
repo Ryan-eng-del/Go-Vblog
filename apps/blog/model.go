@@ -9,20 +9,6 @@ import "github.com/go-playground/validator/v10"
 
 var validate = validator.New()
 
-func (b *Blog) String() string {
-	dj, _ := json.Marshal(b)
-	return string(dj)
-}
-
-func NewCreateBlog(req *CreateBlogRequest) *Blog {
-	return &Blog{
-		CreateAt:          time.Now().Unix(),
-		CreateBlogRequest: req,
-		Status:            STATUS_DRAFT,
-		Tags:              []*tag.Tag{},
-	}
-}
-
 type Blog struct {
 	// 文章Id
 	Id int `json:"id" gorm:"primaryKey"`
@@ -40,9 +26,17 @@ type Blog struct {
 	Tags []*tag.Tag `json:"tags"`
 }
 
-func NewBlogSet() *BlogSet {
-	return &BlogSet{
-		Items: []*Blog{},
+func (b *Blog) String() string {
+	dj, _ := json.Marshal(b)
+	return string(dj)
+}
+
+func NewCreateBlog(req *CreateBlogRequest) *Blog {
+	return &Blog{
+		CreateAt:          time.Now().Unix(),
+		CreateBlogRequest: req,
+		Status:            STATUS_DRAFT,
+		Tags:              []*tag.Tag{},
 	}
 }
 
@@ -53,6 +47,12 @@ type BlogSet struct {
 	Items []*Blog `json:"items"`
 }
 
+func NewBlogSet() *BlogSet {
+	return &BlogSet{
+		Items: []*Blog{},
+	}
+}
+
 func (b *BlogSet) String() string {
 	dj, _ := json.Marshal(b)
 	return string(dj)
@@ -60,15 +60,6 @@ func (b *BlogSet) String() string {
 
 func NewCreateBlogRequest() *CreateBlogRequest {
 	return &CreateBlogRequest{}
-}
-
-func (c *CreateBlogRequest) Validate() error {
-	return validate.Struct(c)
-}
-
-func (b *CreateBlogRequest) String() string {
-	dj, _ := json.Marshal(b)
-	return string(dj)
 }
 
 type CreateBlogRequest struct {
@@ -84,6 +75,15 @@ type CreateBlogRequest struct {
 	Content string `json:"content" validate:"required"`
 	// 文章作者
 	Author string `json:"author"`
+}
+
+func (c *CreateBlogRequest) Validate() error {
+	return validate.Struct(c)
+}
+
+func (c *CreateBlogRequest) String() string {
+	dj, _ := json.Marshal(c)
+	return string(dj)
 }
 
 type UpdateBlogRequest struct {
@@ -143,4 +143,11 @@ type UpdateBlogStatusRequest struct {
 	Id int
 	// 文章状态 草稿/发布
 	Status Status
+}
+
+func NewUpdateBlogStatusRequest(id int, status Status) *UpdateBlogStatusRequest {
+	return &UpdateBlogStatusRequest{
+		Id:     id,
+		Status: status,
+	}
 }

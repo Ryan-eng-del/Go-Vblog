@@ -2,6 +2,10 @@ package blog
 
 import "context"
 
+const (
+	AppName = "blog"
+)
+
 type Service interface {
 	// CreateBlog 创建文章
 	// ctx 接口的上下文, ctx用于区分业务功能数据和非业务功能数据
