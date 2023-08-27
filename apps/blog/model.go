@@ -40,9 +40,22 @@ type Blog struct {
 	Tags []*tag.Tag `json:"tags"`
 }
 
+func NewBlogSet() *BlogSet {
+	return &BlogSet{
+		Items: []*Blog{},
+	}
+}
+
 type BlogSet struct {
-	blogs []*Blog
-	total int32
+	// 总条目个数, 用于前端分页
+	Total int64 `json:"total"`
+	// 列表数据
+	Items []*Blog `json:"items"`
+}
+
+func (b *BlogSet) String() string {
+	dj, _ := json.Marshal(b)
+	return string(dj)
 }
 
 func NewCreateBlogRequest() *CreateBlogRequest {
@@ -53,9 +66,14 @@ func (c *CreateBlogRequest) Validate() error {
 	return validate.Struct(c)
 }
 
+func (b *CreateBlogRequest) String() string {
+	dj, _ := json.Marshal(b)
+	return string(dj)
+}
+
 type CreateBlogRequest struct {
 	// 文章摘要信息,通过提前Content内容获取
-	Summary string `json:"summary" validate:"required" gorm:"-"`
+	Summary string `json:"summary" gorm:"-"`
 	// 文章图片
 	TitleImg string `json:"title_img"`
 	// 文章标题
@@ -74,8 +92,28 @@ type UpdateBlogRequest struct {
 	*CreateBlogRequest
 }
 
+func NewPutUpdateBlogRequest(id int) *UpdateBlogRequest {
+	return &UpdateBlogRequest{
+		BlogId:            id,
+		UpdateMode:        UPDATE_MODE_PUT,
+		CreateBlogRequest: NewCreateBlogRequest(),
+	}
+}
+
+func NewPatchUpdateBlogRequest(id int) *UpdateBlogRequest {
+	return &UpdateBlogRequest{
+		BlogId:            id,
+		UpdateMode:        UPDATE_MODE_PATCH,
+		CreateBlogRequest: NewCreateBlogRequest(),
+	}
+}
+
 type DeleteBlogRequest struct {
 	Id int
+}
+
+func NewDeleteBlogRequest(id int) *DeleteBlogRequest {
+	return &DeleteBlogRequest{Id: id}
 }
 
 type QueryBlogRequest struct {
@@ -88,8 +126,16 @@ type QueryBlogRequest struct {
 	BlogIds []int
 }
 
+func (q *QueryBlogRequest) Offset() int {
+	return (q.PageNumber - 1) * q.PageSize
+}
+
 type DescribeBlogRequest struct {
 	Id int
+}
+
+func NewDescribeBlogRequest(id int) *DescribeBlogRequest {
+	return &DescribeBlogRequest{Id: id}
 }
 
 type UpdateBlogStatusRequest struct {

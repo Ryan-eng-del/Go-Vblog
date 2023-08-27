@@ -3,6 +3,7 @@ module go-vblog
 go 1.19
 
 require (
+	dario.cat/mergo v1.0.0
 	github.com/BurntSushi/toml v1.3.2
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/go-playground/validator/v10 v10.15.1

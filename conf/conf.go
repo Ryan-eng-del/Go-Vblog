@@ -103,6 +103,7 @@ func (m *mysql) Dsn() string {
 		m.Database,
 	)
 }
+
 func (m *mysql) GetORMDB() *gorm.DB {
 	m.lock.Lock()
 	defer m.lock.Unlock()
