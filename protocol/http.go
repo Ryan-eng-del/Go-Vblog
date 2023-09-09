@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/logger"
@@ -13,7 +14,7 @@ import (
 
 func NewHTTP() *HTTP {
 	r := gin.Default()
-	zap.DevelopmentSetup()
+	//zap.DevelopmentSetup()
 
 	return &HTTP{
 		log:    zap.L().Named("server.http"),
@@ -43,6 +44,7 @@ func (h *HTTP) Start() error {
 	httpApi.Init()
 	httpApi.Registry(h.router.Group("/vblog/api/v1"))
 	h.log.Infof("http server serve on: %s", h.server.Addr)
+
 	if err := h.server.ListenAndServe(); err != nil {
 		// 处理正常退出情况
 		if err == http.ErrServerClosed {
@@ -52,4 +54,15 @@ func (h *HTTP) Start() error {
 	}
 
 	return nil
+}
+
+func (h *HTTP) Stop(ctx context.Context) {
+	h.log.Infof("server garceful shutdown ...")
+	// HTTP Server 优雅关闭
+	// 支持ctx, 10分 请求都没退出, 做超时设置
+	if err := h.server.Shutdown(ctx); err != nil {
+		h.log.Warnf("shutdown error, %s", err)
+	} else {
+		h.log.Infof("server garceful shutdown ok")
+	}
 }

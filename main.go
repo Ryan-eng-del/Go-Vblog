@@ -1,15 +1,13 @@
 package main
 
 import (
-	"go-vblog/conf"
-	"go-vblog/protocol"
+	"go-vblog/cmd"
 )
 
 func main() {
-	if err := conf.LoadConfigFromEnv(); err != nil {
-		panic(err)
-	}
-
-	protocol.NewHTTP().Start()
-
+	//if err := conf.LoadConfigFromEnv(); err != nil {
+	//	panic(err)
+	//}
+	//protocol.NewHTTP().Start()
+	cmd.Execute()
 }
