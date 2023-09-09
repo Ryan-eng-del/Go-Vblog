@@ -5,12 +5,14 @@ import (
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
 	"go-vblog/apps/blog"
-	"go-vblog/apps/blog/impl"
+	apps "go-vblog/apps/ioc"
+	"go-vblog/apps/tag"
 )
 
 type HTTPAPI struct {
 	service blog.Service
 	logger  logger.Logger
+	tag     tag.Service
 }
 
 func NewHTTPAPI() *HTTPAPI {
@@ -22,18 +24,20 @@ func (*HTTPAPI) Name() string {
 }
 
 func (h *HTTPAPI) Init() error {
-	h.service = impl.NewBlogServiceImpl()
-	h.service.(*impl.Impl).Init()
-	zap.DevelopmentSetup()
-	h.logger = zap.L().Named("api blog")
+	h.service = apps.GetService(blog.AppName).(blog.Service)
+	h.tag = apps.GetService(tag.AppName).(tag.Service)
+	h.logger = zap.L().Named("api.blog")
 	return nil
 }
 
-func (h *HTTPAPI) Registry(route gin.IRouter) error {
+func (h *HTTPAPI) Registry(route gin.IRouter) {
 	route.POST("/", h.CreateBlog)
 	route.GET("/:id", h.DescribeBlog)
 	route.DELETE("/:id", h.DeleteBlog)
 	route.PUT("/:id", h.PutBlog)
 	route.PATCH("/:id", h.PatchBlog)
-	return nil
+}
+
+func init() {
+	apps.RegistryHttp(&HTTPAPI{})
 }

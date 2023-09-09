@@ -6,7 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/logger"
 	"github.com/infraboard/mcube/logger/zap"
-	"go-vblog/apps/blog/api"
+	_ "go-vblog/apps/all"
+	apps "go-vblog/apps/ioc"
 	"go-vblog/conf"
 	"net/http"
 	"time"
@@ -14,8 +15,6 @@ import (
 
 func NewHTTP() *HTTP {
 	r := gin.Default()
-	//zap.DevelopmentSetup()
-
 	return &HTTP{
 		log:    zap.L().Named("server.http"),
 		router: r,
@@ -40,9 +39,11 @@ type HTTP struct {
 }
 
 func (h *HTTP) Start() error {
-	httpApi := api.HTTPAPI{}
-	httpApi.Init()
-	httpApi.Registry(h.router.Group("/vblog/api/v1"))
+	if err := apps.Init(); err != nil {
+		return err
+	}
+	v1 := h.router.Group("/vblog/api/v1")
+	apps.InitHttpService(v1)
 	h.log.Infof("http server serve on: %s", h.server.Addr)
 
 	if err := h.server.ListenAndServe(); err != nil {
